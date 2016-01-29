@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<title>Shower Presentation Engine</title>
+	<meta charset="utf-8">
+	<meta http-equiv="x-ua-compatible" content="ie=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="stylesheet" href="node_modules/shower-ribbon/styles/screen-16x10.css">
+</head>
+<body class="shower list">
+	<header class="caption">
+		<h1>Низкокалорийная сборка</h1>
+		<p>Роман Парадеев, Яндекс</p>
+	</header>
+	<section class="slide" id="cover">
+		<h2>Низкокалорийная сборка</h2>
+		<p>Роман Парадеев, Яндекс</p>
+		<style>
+			#cover h2 {
+				margin:160px 0 0;
+				text-align:center;
+				font-size:70px;
+				}
+			#cover p {
+				margin:10px 0 0;
+				text-align:center;
+				font-style:italic;
+				font-size:20px;
+				}
+				#cover p a {
+					color:#FFF;
+					}
+		</style>
+	</section>
+
+	<section class="slide">
+		<h2 class="shout">Сборка</h2>
+	</section>
+
+	<section class="slide" id="bundle">
+		<p>📝 📝 📝 📝 📝</p>
+		<p>⏬</p>
+		<p>📝</p>
+		<style>
+			#bundle p {
+			    font-size: 2em;
+			    text-align: center;
+			}
+		</style>
+	</section>
+
+	<section class="slide">
+		<h2>Цели сборки</h2>
+		<ul>
+			<li>меньше запросов к серверу</li>
+			<li>более эффективное сжатие</li>
+			<li>...</li>
+		</ul>
+		<p>В итоге: более быстрая загрузка страницы</p>
+	</section>
+
+	<section class="slide">
+		<h2>ES6 Modules: Исходные файлы</h2>
+		<p class="double">
+			<pre>
+			<code><mark class="comment">// index.js</mark></code>
+			<code class="mark">import { square } from './maths.js';</code>
+			<code>var result = square(-2);</code>
+			<code><mark class="comment">// maths.js</mark></code>
+			<code><mark>export</mark> function square(x) {</code>
+			<code>	return x * x;</code>
+			<code>}</code>
+		</p>
+	</section>
+
+	<section class="slide">
+		<h2>ES6 Modules: Итоговый бандл</h2>
+		<p class="double">
+			<pre>
+			<code><mark class="comment">// bundle.js</mark> </code>
+			<code>function square(x) {</code>
+			<code>	return x * x;</code>
+			<code>}</code>
+			<code>var result = square(-2);</code>
+			</pre>
+		</p>
+	</section>
+
+	<section class="slide">
+		<h2 class="shout">
+			<a href="https://webpack.github.io/">webpack</a>
+		</h2>
+	</section>
+
+	<section class="slide code-shout">
+		<style>
+			.code-shout code {
+				font-size: 2em;
+				margin-top: 20vh;
+			}
+		</style>
+		<pre>
+			<code>webpack index.js bundle.js</code>
+		</pre>
+	</section>
+
+	<section class="slide">
+		<h2>Проблема раздутых библиотек</h2>
+		<p class="double">
+			<pre>
+			<code><mark class="comment">// maths.js</mark></code>
+			<code><mark>export</mark> function square(x) {</code>
+			<code>	return x * x;</code>
+			<code>}</code>
+			<code><mark>export</mark> function cube(x) {</code>
+			<code>	return x * x * x;</code>
+			<code>}</code>
+		</p>
+	</section>
+
+	<section class="slide">
+		<h2>Неиспользуемый код в сборке</h2>
+		<p class="double">
+			<pre>
+			<code><mark class="comment">// bundle.js</mark> </code>
+			<code>function square(x) {</code>
+			<code>	return x * x;</code>
+			<code>}</code>
+			<code>function cube(x) {</code>
+			<code>	return x * x * x;</code>
+			<code>}</code>
+			<code>var result = square(-2);</code>
+			</pre>
+		</p>
+	</section>
+
+	<section class="slide">
+		<h2 class="shout">Всё или ничего</h2>
+	</section>
+
+	<section class="slide">
+		<h2>Подключаем библиотеку</h2>
+		<pre>
+		<code><mark class="comment">// index.js</mark></code>
+		<code>import { <mark>isArray</mark> } from '<mark class="important">./jQuery.js</mark>';</code>
+		<code>console.log(isArray([]));</code>
+		</pre>
+	</section>
+
+	<section class="slide">
+		<h2>Размер сборки с библиотекой</h2>
+		<ul>
+			<li>index.js – 63 B</li>
+			<li>jQuery – 294 KB</li>
+			<li class="next">bundle.js – <mark>294 КB</mark></li>
+		</ul>
+		<p class="next">Что делать?</p>
+	</section>
+
+	<section class="slide">
+		<h2 class="shout">Настраиваемые сборки</h2>
+	</section>
+
+	<section class="slide">
+		<img src="./pictures/customBundle.png" class="cover">
+	</section>
+
+	<section class="slide">
+		<h2>Настраиваемые сборки</h2>
+		<ul>
+			<li>+ готовое решение</li>
+			<li>- есть не у всех вендоров</li>
+			<li>- плохо интегрируется в сборку</li>
+		</ul>
+	</section>
+
+	<section class="slide">
+		<h2>Делаем сборку сами</h2>
+		<ul>
+			<li>Строим синтаксическое дерево (AST)</li>
+			<li>Выборочно удаляем узлы дерева</li>
+			<li>На основе полученного дерева генерируем код</li>
+		</ul>
+	</section>
+
+	<section class="slide">
+		<h2 class="shout">AST</h2>
+	</section>
+
+	<section class="slide">
+		<pre>
+		<code>number = 42;</code>
+		</pre>
+	</section>
+
+	<section class="slide">
+		<pre>
+		<code><mark>number = 42;</mark></code>
+		</pre>
+
+		<ul>
+			<li>ExpressionStatement</li>
+		</ul>
+	</section>
+
+	<section class="slide">
+		<pre>
+		<code><mark>number = 42</mark>;</code>
+		</pre>
+		<ul>
+			<li>ExpressionStatement</li>
+			<ul>
+				<li>AssignmentExpression</li>
+			</ul>
+		</ul>
+	</section>
+
+	<section class="slide">
+		<pre>
+		<code><mark>number</mark> = 42;</code>
+		</pre>
+		<ul>
+			<li>ExpressionStatement</li>
+			<ul>
+				<li>AssignmentExpression</li>
+				<ul>
+					<li>left: Identifier</li>
+				</ul>
+			</ul>
+		</ul>
+	</section>
+
+	<section class="slide">
+		<pre>
+		<code>number = <mark>42</mark>;</code>
+		</pre>
+		<ul>
+			<li>ExpressionStatement</li>
+			<ul>
+				<li>AssignmentExpression</li>
+				<ul>
+					<li>left: Identifier</li>
+					<li>right: Literal</li>
+				</ul>
+			</ul>
+		</ul>
+	</section>
+
+	<section class="slide">
+		<h2 class="shout"><a href="https://astexplorer.net/">astexplorer.net</a></h2>
+	</section>
+
+	<section class="slide">
+		<h2>Вырежем неиспользуемую функцию</h2>
+		<pre>
+		<code>export function square(x) {</code>
+		<code>	return x * x;</code>
+		<code>}</code>
+		<code><mark>export function cube(x) {</mark></code>
+		<code><mark>	return x * x * x;</mark></code>
+		<code><mark>}</mark></code>
+		</pre>
+	</section>
+
+	<section class="slide">
+		<h2>1. Парсинг кода</h2>
+		<pre>
+		<code>var read = require('fs').readFileSync;</code>
+		<code>var esprima = reqiure('esprima');</code>
+		<code class="next">var code = <mark>read</mark>('./src.js');</code>
+		<code class="next">var <mark class="important">syntax</mark> = <mark>esprima</mark>.parse(code);</code>
+		</pre>
+	</section>
+
+	<section class="slide">
+		<h2>2. Модификация дерева</h2>
+		<pre>
+		<code>export function square(x) { ... }</code>
+		<code>export function cube(x) { ... }</code>
+		</pre>
+		<pre>
+		<code><mark>delete</mark> syntax<span class="next">.body<span class="next">[1];</span></span></code>
+		</pre>
+	</section>
+
+	<section class="slide">
+		<h2>3. Генерация кода</h2>
+		<pre>
+		<code>var write = require('fs').writeFileSync;</code>
+		<code>var escodegen = require('escodegen');</code>
+		<code class="next">var <mark class="important">code</mark> = <mark>escodegen</mark>.generate(syntax);</code>
+		<code class="next"><mark>write</mark>('./dst.js', code);</code>
+		</pre>
+	</section>
+
+	<div class="slide">
+		<h2>Результат</h2>
+		<pre>
+		<code><mark class="comment">// maths.js</mark></code>
+		<code>export function square(x) {</code>
+		<code>	return x * x;</code>
+		<code>}</code>
+		</pre>
+	</div>
+
+	<section class="slide">
+		<h2>Собственная сборка</h2>
+		<ul>
+			<li>+ гибкость</li>
+			<li>- хрупкость</li>
+		</ul>
+	</section>
+
+	<section class="slide">
+		<h2 class="shout">Минификация</h2>
+	</section>
+
+	<section class="slide">
+		<h2 class="shout">
+			<a href="http://lisperator.net/uglifyjs/">uglify.js</a>
+		</h2>
+	</section>
+
+	<section class="slide">
+		<h2>Удаление мёртвого кода</h2>
+		<pre>
+		<code>var a = 1;</code>
+ 		<code> </code>
+		<code>if (false) {</code>
+		<code>	a = 2;</code>
+		<code>}</code>
+		</pre>
+	</section>
+
+	<section class="slide">
+		<h2>Удаление мёртвого кода</h2>
+		<pre>
+		<code>var a = 1;</code>
+ 		<code> </code>
+		<code><mark>if (false) {</mark></code>
+		<code><mark>	a = 2;</mark></code>
+		<code><mark>}</mark></code>
+		</pre>
+	</section>
+
+	<section class="slide">
+		<h2>Удаление мёртвого кода</h2>
+		<pre>
+		<code>var a = 1;</code>
+		</pre>
+	</section>
+
+	<section class="slide">
+		<h2>Неиспользуемые экспорты</h2>
+		<pre>
+		<code><mark class="comment">// maths.js</mark></code>
+		<code>export function square() { ... };</code>
+		<code>export function cube() { ... };</code>
+		<code><mark class="comment">// index.js</mark></code>
+		<code><mark>import { square }</mark> from './maths.js';</code>
+		<code>var result = square(-2);</code>
+		</pre>
+	</section>
+
+	<section class="slide">
+		<h2 class="shout">webpack2</h2>
+	</section>
+
+	<section class="slide">
+		<h2>Неиспользуемые экспорты</h2>
+		<pre>
+		<code><mark class="comment">// maths.js</mark></code>
+		<code>export function square() { ... };</code>
+		<code><mark>export</mark> function cube() { ... };</code>
+		<code><mark class="comment">// index.js</mark></code>
+		<code>import { square } from './maths.js';</code>
+		<code>var result = square(-2);</code>
+		</pre>
+	</section>
+
+	<section class="slide">
+		<h2>Неиспользуемые экспорты</h2>
+		<pre>
+		<code><mark class="comment">// maths.js</mark></code>
+		<code>export function square() { ... };</code>
+		<code><mark class="comment">/* export */</mark> function cube() { ... };</code>
+		<code><mark class="comment">// index.js</mark></code>
+		<code>import { square } from './maths.js';</code>
+		<code>var result = square(-2);</code>
+		</pre>
+	</section>
+
+	<section class="slide">
+		<h2>Минификация: предел возможностей</h2>
+		<pre>
+		<code><mark class="comment">// maths.js</mark></code>
+		<code>export function square() { ... };</code>
+		<code><mark>export</mark> function cube() { ... };</code>
+		<code><mark class="important">cube.root</mark> = function () { ... };</code>
+		</pre>
+	</section>
+
+	<section class="slide">
+		<h2 class="shout">tree shaking</h2>
+	</section>
+
+	<section class="slide">
+		<h2 class="shout">
+			<a href="http://rollupjs.org/">rollup.js</a>
+		</h2>
+	</section>
+
+	<section class="slide code-shout">
+		<style>
+			.code-shout code {
+				font-size: 2em;
+				margin-top: 20vh;
+			}
+		</style>
+		<pre>
+			<code>rollup index.js > bundle.js</code>
+		</pre>
+	</section>
+
+	<section class="slide">
+		<h2>tree shaking: включение части модуля</h2>
+		<pre>
+		<code><mark class="comment">// maths.js</mark></code>
+		<code><mark>export function square ( x ) { return x * x; }</mark></code>
+		<code>export function cube ( x ) { return x * x * x; }</code>
+		<code><mark class="comment">// main.js</mark></code>
+		<code>import { cube } from './maths.js';</code>
+		<code>cube( 5 );</code>
+		</pre>
+	</section>
+
+	<section class="slide">
+		<h2>tree shaking: включение части модуля</h2>
+		<pre>
+		<code><mark class="comment">// bundle.js</mark></code>
+		<code>function cube ( x ) { return x * x * x; }</code>
+		<code>cube( 5 );</code>
+		</pre>
+	</section>
+
+	<section class="slide">
+		<h2>tree shaking: зависимости внутри модуля</h2>
+		<pre>
+		<code><mark class="comment">// maths.js</mark></code>
+		<code>export function square ( x ) { return x * x; }</code>
+		<code>export function cube ( x ) { return <mark>square(x)</mark> * x; }</code>
+		<code><mark class="comment">// main.js</mark></code>
+		<code>import { cube } from './maths.js';</code>
+		<code>cube( 5 );</code>
+		</pre>
+	</section>
+
+	<section class="slide">
+		<h2>tree shaking: зависимости внутри модуля</h2>
+		<pre>
+		<code><mark class="comment">// bundle.js</mark></code>
+		<code>function square ( x ) { return x * x; }</code>
+		<code>function cube ( x ) { return square(x) * x; }</code>
+		<code>cube( 5 );</code>
+		</pre>
+	</section>
+
+	<section class="slide">
+		<h2>tree shaking: доступ внутри модуля</h2>
+		<pre>
+		<code><mark class="comment">// maths.js</mark></code>
+		<code>export function square ( x ) { return x * x; }</code>
+		<code>export function <mark>square.root</mark> ( x ) { return Math.sqrt(x); }</code>
+		<code>export function cube ( x ) { return square(x) * x; }</code>
+		<code><mark class="comment">// main.js</mark></code>
+		<code>import { cube } from './maths.js';</code>
+		<code>cube( 5 );</code>
+		</pre>
+	</section>
+
+	<section class="slide">
+		<h2>tree shaking: доступ внутри модуля</h2>
+		<pre>
+		<code><mark class="comment">// bundle.js</mark></code>
+		<code>function cube ( x ) { return x * x * x; }</code>
+		<code>cube( 5 );</code>
+		</pre>
+	</section>
+
+	<section class="slide">
+		<h2>tree shaking</h2>
+		<ul>
+			<li>+ более умный анализ</li>
+			<li>- только ES6 modules</li>
+		</ul>
+	</section>
+
+	<section class="slide">
+		<h2 class="shout">так что с jQuery?</h2>
+	</section>
+
+	<!-- пример с андерскором или jauery -->
+
+	<section class="slide">
+		<h2>Удаление неиспользуемого кода</h2>
+		<ul>
+			<li>Вручную</li>
+			<li>Минификация</li>
+			<li>tree-shaking</li>
+		</ul>
+	</section>
+
+	<section class="slide">
+		<h2>Низкокалорийная сборка</h2>
+		<p>Роман Парадеев, Яндекс</p>
+		<ul>
+			<li>слайды – <a href="https://github.com/sameoldmadness/fat-free-bundles-slides">https://github.com/sameoldmadness/fat-free-bundles-slides</a></li>
+			<li>демо – <a href="https://github.com/sameoldmadness/fat-free-bundles-demo">https://github.com/sameoldmadness/fat-free-bundles-demo</a></li>
+			<li>ручная сборка – <a href="https://github.com/sameoldmadness/bh-custom">https://github.com/sameoldmadness/bh-custom</a></li>
+			<li>rollup.js – <a href="http://rollupjs.org/">http://rollupjs.org/</a></li>
+			<li>webpack – <a href="https://webpack.github.io/">https://webpack.github.io/</a></li>
+		</ul>
+	</section>
+
+	<div class="progress"></div>
+	<script src="node_modules/shower-core/shower.min.js"></script>
+</body>
+</html>
